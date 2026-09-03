@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12141a">
+<title>Handy-LLM</title>
+<meta name="description" content="KI-Chat, der auf dem Handy selbst rechnet - und den PC im Netz nutzt, wenn er an ist.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Handy-LLM">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="bar">
+  <button id="btn-menu" class="icon-btn" aria-label="Verlauf leeren" title="Verlauf leeren">&#8635;</button>
+  <div class="who">
+    <span id="badge" class="badge badge-wait">wird geprüft</span>
+    <span id="who-sub" class="who-sub">Start…</span>
+  </div>
+  <button id="btn-settings" class="icon-btn" aria-label="Einstellungen" title="Einstellungen">&#9881;</button>
+</header>
+
+<div id="notice" class="notice" hidden></div>
+
+<div id="progress" class="progress" hidden>
+  <div class="progress-text" id="progress-text">Modell wird geladen…</div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<main id="chat" class="chat" aria-live="polite">
+  <div class="empty" id="empty">
+    <p class="empty-title">Bereit.</p>
+    <p class="empty-sub">Schreib unten los. Läuft der PC, rechnet er — sonst dein Handy.</p>
+  </div>
+</main>
+
+<form id="composer" class="composer">
+  <textarea id="input" rows="1" placeholder="Nachricht…" autocomplete="off"
+            enterkeyhint="send" aria-label="Nachricht"></textarea>
+  <button id="send" type="submit" class="send" aria-label="Senden">&#10148;</button>
+  <button id="stop" type="button" class="send stop" aria-label="Stopp" hidden>&#9632;</button>
+</form>
+
+<dialog id="settings" class="sheet">
+  <form method="dialog" class="sheet-inner">
+    <h2>Einstellungen</h2>
+
+    <label class="field">
+      <span class="label">Wer rechnet?</span>
+      <select id="set-route">
+        <option value="auto">Automatisch — PC wenn an, sonst Handy</option>
+        <option value="pc">Nur PC</option>
+        <option value="phone">Nur Handy</option>
+      </select>
+    </label>
+
+    <fieldset class="group">
+      <legend>PC im Netz</legend>
+      <label class="field">
+        <span class="label">Adresse</span>
+        <input id="set-pcurl" type="url" inputmode="url" autocapitalize="off" autocorrect="off"
+               spellcheck="false" placeholder="https://pc.dein-tailnet.ts.net">
+      </label>
+      <label class="field">
+        <span class="label">Modell auf dem PC</span>
+        <select id="set-pcmodel"><option value="">— PC nicht erreichbar —</option></select>
+      </label>
+      <div class="row">
+        <button type="button" id="btn-testpc" class="btn">Jetzt testen</button>
+        <span id="pc-status" class="hint"></span>
+      </div>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend>Handy (rechnet offline)</legend>
+      <label class="field">
+        <span class="label">Modell</span>
+        <select id="set-phonemodel"></select>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="set-allmodels">
+        <span>Auch große Modelle zeigen</span>
+      </label>
+      <div class="row">
+        <button type="button" id="btn-preload" class="btn">Modell jetzt laden</button>
+        <span id="cache-status" class="hint"></span>
+      </div>
+    </fieldset>
+
+    <label class="field">
+      <span class="label">Systemprompt</span>
+      <textarea id="set-system" rows="3" placeholder="Antworte kurz und auf Deutsch."></textarea>
+    </label>
+
+    <div class="sheet-actions">
+      <button value="cancel" class="btn">Schließen</button>
+      <button value="save" id="btn-save" class="btn btn-primary">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
