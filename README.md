@@ -15,9 +15,21 @@ Die App wählt automatisch: PC wenn erreichbar, sonst Handy.
 
 ---
 
+## 0. Einmalig: Pages einschalten
+
+Repo → **Settings** → **Pages** → unter *Build and deployment* die Quelle auf
+**GitHub Actions** stellen.
+
+Der Workflow versucht das selbst (`enablement: true`), scheitert aber am
+Standard-Token: *„Resource not accessible by integration"*. Pages anzulegen
+darf ein Workflow-Token nicht — danach läuft alles automatisch, jeder Push auf
+`main` veröffentlicht neu.
+
+---
+
 ## 1. Auf dem Handy einrichten
 
-1. Seite öffnen: **https://DEIN-NAME.github.io/handy-llm/**
+1. Seite öffnen: **https://jurokk-cloud.github.io/handy-llm/**
 2. Zum Startbildschirm hinzufügen
    - **Android/Chrome:** Menü `⋮` → *Zum Startbildschirm hinzufügen*
    - **iPhone/Safari:** Teilen-Symbol → *Zum Home-Bildschirm*
