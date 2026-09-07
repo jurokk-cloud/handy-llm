@@ -33,7 +33,11 @@ darf ein Workflow-Token nicht — danach läuft alles automatisch, jeder Push au
 2. Zum Startbildschirm hinzufügen
    - **Android/Chrome:** Menü `⋮` → *Zum Startbildschirm hinzufügen*
    - **iPhone/Safari:** Teilen-Symbol → *Zum Home-Bildschirm*
-3. App öffnen → Zahnrad → **Modell jetzt laden** (einmalig, im WLAN!)
+3. App öffnen — eine kurze Einführung führt dich durch den Rest
+
+Beim ersten Start erklärt die App in drei Schritten, was sie tut, und bietet
+den Modell-Download direkt an. Jeder Fachbegriff hat ein **?** daneben, das ihn
+in Alltagssprache erklärt; unter **?** oben links liegen die häufigen Fragen.
 
 Das Modell wird einmal heruntergeladen (~0,9 GB bei der Voreinstellung) und
 bleibt danach auf dem Gerät. Ab dann läuft der Handy-Modus ohne Internet.
@@ -106,6 +110,18 @@ Einrichtung: [tailscale.com/download](https://tailscale.com/download) auf PC
 | Handy-Antwort bricht ab | zu wenig Arbeitsspeicher | Zahnrad → kleineres Modell (z. B. Qwen3-0.6B) |
 
 ---
+
+## Oberfläche
+
+Gebaut für ein Telefon in einer Hand, und für Köpfe, die sich nicht durch
+Menüs wühlen wollen:
+
+- **Geführter erster Start** statt leerem Bildschirm
+- **Antippbare Erklärungen** an jedem Fachbegriff — Tap, kein Hover
+- **Hilfe-Bereich** mit den Fragen, die wirklich aufkommen
+- **Fehler in Klartext**, jeweils mit dem Knopf, der sie behebt
+- **Statusanzeige sagt, wer gerade rechnet** — antippbar für den Grund
+- Alle Tippziele mindestens 44 px, hell und dunkel, `prefers-reduced-motion`
 
 ## Technik
 

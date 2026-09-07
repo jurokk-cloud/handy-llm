@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#12141a">
+<meta name="theme-color" content="#0f1116">
 <title>Handy-LLM</title>
-<meta name="description" content="KI-Chat, der auf dem Handy selbst rechnet - und den PC im Netz nutzt, wenn er an ist.">
+<meta name="description" content="Ein KI-Chat, der auf deinem Handy rechnet. Ohne Konto, ohne Cloud.">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
@@ -17,92 +17,228 @@
 </head>
 <body>
 
-<header class="bar">
-  <button id="btn-menu" class="icon-btn" aria-label="Verlauf leeren" title="Verlauf leeren">&#8635;</button>
-  <div class="who">
-    <span id="badge" class="badge badge-wait">wird geprüft</span>
-    <span id="who-sub" class="who-sub">Start…</span>
+<!-- ══════════ Begrüßung: nur beim allerersten Start ══════════ -->
+<section id="intro" class="intro" hidden>
+  <div class="intro-dots" aria-hidden="true">
+    <span class="dot on"></span><span class="dot"></span><span class="dot"></span>
   </div>
-  <button id="btn-settings" class="icon-btn" aria-label="Einstellungen" title="Einstellungen">&#9881;</button>
-</header>
 
-<div id="notice" class="notice" hidden></div>
+  <div class="intro-stage">
+    <!-- Schritt 1 -->
+    <article class="slide on" data-slide="1">
+      <div class="slide-art">💬</div>
+      <h1>Dein eigener KI-Chat</h1>
+      <p class="lead">Er läuft auf deinem Handy. Nicht in der Cloud.</p>
+      <ul class="checks">
+        <li><span class="check">✓</span><div><b>Kein Konto</b><br><span class="muted">Keine Anmeldung, keine E-Mail</span></div></li>
+        <li><span class="check">✓</span><div><b>Nichts verlässt dein Gerät</b><br><span class="muted">Deine Fragen bleiben hier</span></div></li>
+        <li><span class="check">✓</span><div><b>Funktioniert offline</b><br><span class="muted">Auch im Funkloch oder Flugzeug</span></div></li>
+      </ul>
+    </article>
 
-<div id="progress" class="progress" hidden>
-  <div class="progress-text" id="progress-text">Modell wird geladen…</div>
-  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-</div>
+    <!-- Schritt 2 -->
+    <article class="slide" data-slide="2">
+      <div class="slide-art">⚡</div>
+      <h1>Zwei Motoren</h1>
+      <p class="lead">Die App sucht sich selbst den besseren aus.</p>
+      <div class="engine-cards">
+        <div class="engine engine-phone">
+          <div class="engine-icon">📱</div>
+          <div class="engine-body">
+            <b>Dein Handy</b>
+            <span>Immer da. Klein und langsam, aber es reicht für vieles.</span>
+          </div>
+        </div>
+        <div class="engine-or">und wenn verfügbar</div>
+        <div class="engine engine-pc">
+          <div class="engine-icon">🖥️</div>
+          <div class="engine-body">
+            <b>Dein PC</b>
+            <span>Deutlich schlauer und schneller — sobald er eingeschaltet ist.</span>
+          </div>
+        </div>
+      </div>
+      <p class="note">Du musst nie umschalten. Das passiert von allein.</p>
+    </article>
 
-<main id="chat" class="chat" aria-live="polite">
-  <div class="empty" id="empty">
-    <p class="empty-title">Bereit.</p>
-    <p class="empty-sub">Schreib unten los. Läuft der PC, rechnet er — sonst dein Handy.</p>
+    <!-- Schritt 3 -->
+    <article class="slide" data-slide="3">
+      <div class="slide-art">📥</div>
+      <h1>Einmal herunterladen</h1>
+      <p class="lead">Dann gehört das Modell dir — für immer, offline.</p>
+      <div class="dl-card">
+        <div class="dl-row">
+          <span class="muted">Modell</span>
+          <b id="intro-model-name">Llama 3.2</b>
+        </div>
+        <div class="dl-row">
+          <span class="muted">Größe</span>
+          <b id="intro-model-size">~0,9 GB</b>
+        </div>
+        <div class="dl-row">
+          <span class="muted">Dauer</span>
+          <b>2–5 Minuten</b>
+        </div>
+      </div>
+      <p class="warnbox">📶 Am besten im WLAN — das ist eine große Datei.</p>
+    </article>
   </div>
-</main>
 
-<form id="composer" class="composer">
-  <textarea id="input" rows="1" placeholder="Nachricht…" autocomplete="off"
-            enterkeyhint="send" aria-label="Nachricht"></textarea>
-  <button id="send" type="submit" class="send" aria-label="Senden">&#10148;</button>
-  <button id="stop" type="button" class="send stop" aria-label="Stopp" hidden>&#9632;</button>
-</form>
+  <div class="intro-actions">
+    <button id="intro-next" class="btn btn-big btn-primary">Weiter</button>
+    <button id="intro-skip" class="btn-plain">Später einrichten</button>
+  </div>
+</section>
 
-<dialog id="settings" class="sheet">
-  <form method="dialog" class="sheet-inner">
-    <h2>Einstellungen</h2>
+<!-- ══════════════════════ Die App ══════════════════════ -->
+<div id="app" class="app" hidden>
 
-    <label class="field">
-      <span class="label">Wer rechnet?</span>
-      <select id="set-route">
-        <option value="auto">Automatisch — PC wenn an, sonst Handy</option>
-        <option value="pc">Nur PC</option>
-        <option value="phone">Nur Handy</option>
-      </select>
-    </label>
+  <header class="topbar">
+    <button id="btn-help" class="round-btn" aria-label="Hilfe">?</button>
 
-    <fieldset class="group">
-      <legend>PC im Netz</legend>
-      <label class="field">
-        <span class="label">Adresse</span>
-        <input id="set-pcurl" type="url" inputmode="url" autocapitalize="off" autocorrect="off"
-               spellcheck="false" placeholder="https://pc.dein-tailnet.ts.net">
-      </label>
-      <label class="field">
-        <span class="label">Modell auf dem PC</span>
-        <select id="set-pcmodel"><option value="">— PC nicht erreichbar —</option></select>
-      </label>
-      <div class="row">
-        <button type="button" id="btn-testpc" class="btn">Jetzt testen</button>
-        <span id="pc-status" class="hint"></span>
-      </div>
-    </fieldset>
+    <button id="status" class="status" aria-label="Status — antippen für Details">
+      <span id="status-dot" class="sdot"></span>
+      <span class="status-text">
+        <span id="status-title">Wird geprüft…</span>
+        <span id="status-sub" class="status-sub">Einen Moment</span>
+      </span>
+    </button>
 
-    <fieldset class="group">
-      <legend>Handy (rechnet offline)</legend>
-      <label class="field">
-        <span class="label">Modell</span>
-        <select id="set-phonemodel"></select>
-      </label>
-      <label class="check">
-        <input type="checkbox" id="set-allmodels">
-        <span>Auch große Modelle zeigen</span>
-      </label>
-      <div class="row">
-        <button type="button" id="btn-preload" class="btn">Modell jetzt laden</button>
-        <span id="cache-status" class="hint"></span>
-      </div>
-    </fieldset>
+    <button id="btn-settings" class="round-btn" aria-label="Einstellungen">⚙</button>
+  </header>
 
-    <label class="field">
-      <span class="label">Systemprompt</span>
-      <textarea id="set-system" rows="3" placeholder="Antworte kurz und auf Deutsch."></textarea>
-    </label>
+  <div id="banner" class="banner" hidden></div>
 
-    <div class="sheet-actions">
-      <button value="cancel" class="btn">Schließen</button>
-      <button value="save" id="btn-save" class="btn btn-primary">Speichern</button>
+  <div id="loadbar" class="loadbar" hidden>
+    <div class="loadbar-head">
+      <span id="loadbar-title">Modell wird geladen</span>
+      <span id="loadbar-pct" class="loadbar-pct">0 %</span>
+    </div>
+    <div class="track"><div id="loadbar-fill" class="fill"></div></div>
+    <div id="loadbar-sub" class="loadbar-sub">Das passiert nur dieses eine Mal.</div>
+  </div>
+
+  <main id="chat" class="chat">
+    <div id="welcome" class="welcome">
+      <div class="welcome-art">💬</div>
+      <h2 id="welcome-title">Frag mich was</h2>
+      <p id="welcome-sub" class="muted">Tipp unten los — oder probier eins davon:</p>
+      <div class="chips" id="starters"></div>
+    </div>
+  </main>
+
+  <form id="composer" class="composer">
+    <div class="composer-inner">
+      <textarea id="input" rows="1" placeholder="Nachricht schreiben…"
+                enterkeyhint="send" autocomplete="off" aria-label="Deine Nachricht"></textarea>
+      <button id="send" type="submit" class="circle-btn" aria-label="Senden">↑</button>
+      <button id="stop" type="button" class="circle-btn danger" aria-label="Anhalten" hidden>■</button>
     </div>
   </form>
+</div>
+
+<!-- ══════════════════════ Erklär-Blatt ══════════════════════ -->
+<dialog id="tip" class="sheet sheet-small">
+  <div class="sheet-body">
+    <h3 id="tip-title"></h3>
+    <div id="tip-text" class="tip-text"></div>
+    <button class="btn btn-big btn-primary" id="tip-ok">Verstanden</button>
+  </div>
+</dialog>
+
+<!-- ══════════════════════ Einstellungen ══════════════════════ -->
+<dialog id="settings" class="sheet">
+  <div class="sheet-body">
+    <div class="sheet-top">
+      <h3>Einstellungen</h3>
+      <button class="round-btn" data-close aria-label="Schließen">✕</button>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <h4>Wer soll rechnen?</h4>
+        <button class="q" data-tip="route" aria-label="Erklärung">?</button>
+      </div>
+      <div class="seg" id="seg-route" role="radiogroup">
+        <button type="button" class="seg-btn on" data-val="auto" role="radio">Automatisch</button>
+        <button type="button" class="seg-btn" data-val="pc" role="radio">PC</button>
+        <button type="button" class="seg-btn" data-val="phone" role="radio">Handy</button>
+      </div>
+      <p class="card-note" id="route-note">Empfohlen: nimmt den PC, wenn er läuft — sonst dein Handy.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h4>📱 Dein Handy</h4>
+        <button class="q" data-tip="phone" aria-label="Erklärung">?</button>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Modell <button class="q q-inline" data-tip="model" aria-label="Erklärung">?</button></span>
+        <select id="set-phonemodel"></select>
+      </label>
+
+      <label class="switch">
+        <input type="checkbox" id="set-allmodels">
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-label">Auch große Modelle anzeigen
+          <small>Nur für Geräte mit viel Speicher</small></span>
+      </label>
+
+      <div id="model-state" class="state-line"></div>
+      <button type="button" id="btn-download" class="btn btn-big btn-primary">Modell herunterladen</button>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h4>🖥️ Dein PC</h4>
+        <button class="q" data-tip="pc" aria-label="Erklärung">?</button>
+      </div>
+      <p class="card-note">Optional. Macht die Antworten deutlich besser, wenn der PC läuft.</p>
+
+      <label class="field">
+        <span class="field-label">Adresse <button class="q q-inline" data-tip="pcurl" aria-label="Erklärung">?</button></span>
+        <input id="set-pcurl" type="url" inputmode="url" autocapitalize="off"
+               autocorrect="off" spellcheck="false" placeholder="https://pc.dein-netz.ts.net">
+      </label>
+
+      <div id="pc-state" class="state-line"></div>
+      <button type="button" id="btn-testpc" class="btn btn-big">Verbindung testen</button>
+
+      <label class="field" id="pcmodel-field" hidden>
+        <span class="field-label">Modell auf dem PC</span>
+        <select id="set-pcmodel"></select>
+      </label>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h4>Feineinstellung</h4>
+        <button class="q" data-tip="system" aria-label="Erklärung">?</button>
+      </div>
+      <label class="field">
+        <span class="field-label">So soll die KI antworten</span>
+        <textarea id="set-system" rows="3" placeholder="Antworte kurz und auf Deutsch."></textarea>
+      </label>
+      <button type="button" id="btn-reset" class="btn btn-quiet">Verlauf löschen</button>
+    </section>
+
+    <div class="save-bar">
+      <button class="btn btn-big btn-primary" id="btn-save">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ══════════════════════ Hilfe ══════════════════════ -->
+<dialog id="help" class="sheet">
+  <div class="sheet-body">
+    <div class="sheet-top">
+      <h3>Hilfe</h3>
+      <button class="round-btn" data-close aria-label="Schließen">✕</button>
+    </div>
+    <div id="help-list" class="faq"></div>
+    <button class="btn btn-big" id="btn-replay">Einführung nochmal ansehen</button>
+  </div>
 </dialog>
 
 <script type="module" src="./app.js"></script>
